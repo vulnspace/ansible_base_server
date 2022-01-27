@@ -1,0 +1,48 @@
+---
+- name: BASE | install basic packages
+  import_tasks: packages.yml
+
+- name: BASE | add sysuser user
+  ansible.builtin.user:
+    name: sysuser
+    shell: /bin/bash
+    system: no
+    create_home: yes
+    groups: sudo,docker
+    password: "{{ default_password }}"
+  tags: ["user"]
+
+- name: BASE | setup sshd
+  import_tasks: sshd.yml
+  tags:
+    - iptables
+
+- name: BASE | setup iptables
+  import_tasks: iptables.yml
+  tags:
+    - iptables
+
+- name: BASE | set timezone
+  command:
+    cmd: timedatectl set-timezone "{{ timezone }}"
+
+- name: BASE | systemd-resolved setup
+  template:
+    src: resolved.conf
+    dest: /etc/systemd/resolved.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+
+- name: BASE | systemd-resolved restart
+  service:
+    name: systemd-resolved
+    state: restarted
+
+- name: BASE | setup bashrc
+  import_tasks: bash.yml
+
+- name: BASE | setup unattended upgrades
+  import_tasks: unattended.yml
+  tags: ['unattended']

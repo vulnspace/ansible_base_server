@@ -1,0 +1,12 @@
+AddressFamily inet
+PermitRootLogin forced-commands-only
+StrictModes yes
+MaxAuthTries 5
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+UsePAM yes
+X11Forwarding yes
+PrintMotd yes
+TCPKeepAlive yes

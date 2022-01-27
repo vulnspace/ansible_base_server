@@ -1,0 +1,20 @@
+---
+- name: PACKAGES | update repo
+  apt:
+    update_cache: yes
+
+- name: PACKAGES | install packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openssh-server
+    - unattended-upgrades
+    - update-notifier-common
+    - mailutils
+    - iptables
+    - syslog-ng
+    - cron
+    - logrotate
+    - docker.io
+    - git

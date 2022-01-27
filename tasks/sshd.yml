@@ -1,0 +1,26 @@
+---
+- name: SSHD | setup sshd
+  template:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  tags: ['sshd']
+
+- name: SSHD | root key
+  ansible.posix.authorized_key:
+    user: "{{ item }}"
+    state: present
+    key: "{{ ssh_key }}"
+  tags: ['sshd']
+  with_items:
+    - root
+    - sysuser
+
+- name: SSHD | restart SSHD
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+  tags: ['sshd']

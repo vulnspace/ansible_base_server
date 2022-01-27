@@ -1,0 +1,24 @@
+---
+- name: BASHRC | setup PYTHONPATH
+  ansible.builtin.lineinfile:
+    insertafter: EOF
+    search_string: export PYTHONPATH
+    line: "{{ pythonpath }}"
+    path: "{{ item }}/.bashrc"
+  with_items:
+    - "/root/"
+    - "/home/sysuser"
+  tags:
+    - bashrc
+
+- name: BASHRC | setup PS1
+  ansible.builtin.lineinfile:
+    insertafter: EOF
+    search_string: 'export PS1'
+    line: 'export PS1="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[00m\]@\[\e[31m\]__PROD__\[\e[m\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "'
+    path: "{{ item }}/.bashrc"
+  with_items:
+    - "/root/"
+    - "/home/sysuser"
+  tags:
+    - bashrc

@@ -1,0 +1,76 @@
+---
+- name: IPTABLES | Packages needed
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - iptables-persistent
+    - netfilter-persistent
+
+- name: IPTABLES IPV4 | Allow related and established connections
+  iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: IPTABLES IPV6 | Allow related and established connections
+  iptables:
+    ip_version: ipv6
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: IPTABLES | Allow new incoming SYN packets on TCP port 22 (SSH)
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: 22
+    ctstate: NEW
+    syn: match
+    jump: ACCEPT
+      
+- name: IPTABLES IPV4 | Set the policy for the INPUT chain to DROP
+  iptables:
+    chain: INPUT
+    policy: DROP
+
+- name: IPTABLES IPV6 | Set the policy for the INPUT chain to DROP
+  iptables:
+    ip_version: ipv6
+    chain: INPUT
+    policy: DROP
+
+- name: IPTABLES IPv4 | Allow from localhost
+  iptables:
+    chain: INPUT
+    source: "{{ item }}"
+    jump: ACCEPT
+  with_items:
+    - "{{ local_network }}"
+    - 127.0.0.1
+
+- name: IPTABLES IPv4 | Allow to Hetzner local and Docker networks
+  iptables:
+    chain: OUTPUT
+    destination: "{{ item }}"
+    jump: ACCEPT
+  with_items:
+    - "{{ local_network }}"
+    - 10.0.0.0/16
+    - 172.17.0.0/16
+
+- name: IPTABLES IPv4 | Drop packages to private DST
+  iptables:
+    chain: OUTPUT
+    destination: "{{ item }}"
+    jump: DROP
+  with_items:
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+    - 10.0.0.0/8
+
+- name: IPTABLES | save iptables v4 rules
+  shell: iptables-save > /etc/iptables/rules.v4
+
+- name: IPTABLES | save iptables v6 rules
+  shell: ip6tables-save > /etc/iptables/rules.v6

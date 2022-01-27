@@ -22,4 +22,6 @@ prod-nodes:
     - base_server
 ```
 3) Из директории /etc/ansible запустить
+```
 ansible-playbook -i hosts -K -v tasks/setup_base_server.yml -e "host_to_setup=HOSTS_TO_SETUP" --tags=sshd
+```
